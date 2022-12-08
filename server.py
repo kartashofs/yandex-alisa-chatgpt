@@ -32,8 +32,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-front_path, build_path = pathlib.Path(__file__).parent.resolve() / 'public', pathlib.Path(__file__).parent.resolve() / 'build'
-
 @app.get("/api/alisa-request")
 @limiter.limit("50/minute")
 async def handle_alisa_request(response: str, request: Request):
@@ -43,6 +41,7 @@ async def handle_alisa_request(response: str, request: Request):
     status = data["request"]["original_utterance"]
     
     if status:
+        chat = Chat(email="email", password="password")
         answer = chat.ask(question)
     
         return JSONResponse(
