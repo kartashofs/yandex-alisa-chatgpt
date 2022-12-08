@@ -1,5 +1,3 @@
-from pychatgpt import Chat
-
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
@@ -11,10 +9,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.responses import RedirectResponse
+
 import uvicorn
 from uvicorn import Config, Server
 
-host_address = ''
+from pyChatGPT import ChatGPT
+
+host_address = 'UNSPECIFIED'
 
 limiter = Limiter(key_func=get_remote_address)
 
@@ -37,11 +38,10 @@ app.add_middleware(
 async def handle_alisa_request(response: str, request: Request):
     data = await request.json()
     
-    question = str(data[""])
-    status = data["request"]["original_utterance"]
-    
-    if status:
-        chat = Chat(email="email", password="password")
+    question = str(data["request"]["original_utterance"])
+  
+    if question:
+        chat = ChatGPT.Chat(email="EMAIL", password="PASS")
         answer = chat.ask(question)
     
         return JSONResponse(
@@ -56,10 +56,9 @@ async def handle_alisa_request(response: str, request: Request):
                 content={"session": data["session"],
                          "version": data["version"],
                          "response": {"end_session": False,
-                                      "text": "Привет, я GPT-bot, который работает на основе OpenAI ChatGPT бота. Чтобы познакомиться с кодом, посети телеграм канал: @kartashofs"} })
+                                      "text": "Привет, я GPT-bot, который работает на основе нейронной сети от OpenAI. Я могу фантазировать, делать технические расчеты - быть твоим умным собеседником и другом. Можешь ознакомиться с кодом в телеграм канале: @kartashofs"} })
 
 if __name__ == '__main__':
-    uvicorn.run("main:app", 
+    uvicorn.run("server:app", 
     port=80,
-    host=host_address,
-    reload=False)
+    reload=True)
