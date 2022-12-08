@@ -1,19 +1,9 @@
-from loader import dp, bot
-from loader import token
+from pychatgpt import Chat
 
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
-
-import pathlib
-from urllib.parse import unquote 
 import json
-
-from aiogram.utils.markdown import hide_link
-from handlers.users.user_status import *
-from utils.set_bot_commands import set_default_commands
-from keyboards.inline.choice_but_start_test import *
-from aiogram.utils.web_app import check_webapp_signature, safe_parse_webapp_init_data
 
 from fastapi import FastAPI, Request, status
 from fastapi import FastAPI, File, UploadFile
@@ -44,36 +34,30 @@ app.add_middleware(
 
 front_path, build_path = pathlib.Path(__file__).parent.resolve() / 'public', pathlib.Path(__file__).parent.resolve() / 'build'
 
-@app.get("/api/alisa-request/{response}")
+@app.get("/api/alisa-request")
 @limiter.limit("50/minute")
-async def sample_function(response: str, request: Request):
-    data = response.rsplit("_", 1)
-    verify_data, additional_data = data[-2], data[-1]
-
-    check_string = unquote(verify_data)
-
-    valid_status = check_webapp_signature(token=token, init_data=liker_check_string)
-
-    if valid_status:
-        data = safe_parse_webapp_init_data(token=token, init_data=check_string, _loads=json.loads)
-
-
+async def handle_alisa_request(response: str, request: Request):
+    data = await request.json()
+    
+    question = str(data[""])
+    status = data["request"]["original_utterance"]
+    
+    if status:
+        answer = chat.ask(question)
+    
         return JSONResponse(
                 status_code=status.HTTP_200_OK,
-                content={ "message": "Успешно отправлен запрос!" }
-        )
+                content={"session": data["session"],
+                         "version": data["version"],
+                         "response": {"end_session": False,
+                                      "text": answer} })
     else:
         return JSONResponse(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        content={ "message": "Вы не авторизованы." }
-        )
-    
-app.mount("/", StaticFiles(directory=build_path, html=True), name="front")
-
-@app.get('/')
-@limiter.limit("20/minute")
-async def front(request: Request):
-   return RedirectResponse(url='front')
+                status_code=status.HTTP_200_OK,
+                content={"session": data["session"],
+                         "version": data["version"],
+                         "response": {"end_session": False,
+                                      "text": "Привет, я GPT-bot, который работает на основе OpenAI ChatGPT бота. Чтобы познакомиться с кодом, посети телеграм канал: @kartashofs"} })
 
 if __name__ == '__main__':
     uvicorn.run("main:app", 
