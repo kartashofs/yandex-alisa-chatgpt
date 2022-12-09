@@ -56,7 +56,7 @@ async def handle_alisa_request(response: str, request: Request):
                 content={"session": data["session"],
                          "version": data["version"],
                          "response": {"end_session": False,
-                                      "text": "Привет, я GPT-bot, который работает на основе нейронной сети от OpenAI. Я могу фантазировать, делать технические расчеты - быть твоим умным собеседником и другом. Можешь ознакомиться с кодом в телеграм канале: @kartashofs"} })
+                                      "text": "Привет, я GPT-bot, который работает на основе нейронной сети от OpenAI. Я могу фантазировать, делать технические расчеты - быть твоим умным собеседником и другом. Можешь ознакомиться с кодом в телеграм канале: @keystoner"} })
 
 if __name__ == '__main__':
     uvicorn.run("server:app", 
