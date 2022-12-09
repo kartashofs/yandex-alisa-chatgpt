@@ -13,7 +13,7 @@ from starlette.responses import RedirectResponse
 import uvicorn
 from uvicorn import Config, Server
 
-from ChatGPT import ChatGPT
+from __init__ import ChatGPT
 
 host_address = 'UNSPECIFIED'
 
